@@ -1,0 +1,10 @@
+Authored by: Jesin Jarod Martinez & Janella Marie Co
+
+Notes on WDI OLAP:
+ * The entire folder is a Java Project so just import
+ * There are 3 packages within the project: default, gui and util.
+   > default package - Driver Class
+   > gui package - All Classes regarding the GUI
+   > util package - All Classes regarding the Database
+ * When overwriting and not using this as the main folder please just delete the project in this folder and replace with your own updated copy
+ * Inside the folder is a folder called "jarlib" which contains any external jar files that is needed by the project but not in the default library 
