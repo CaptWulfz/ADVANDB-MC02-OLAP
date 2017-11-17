@@ -249,7 +249,7 @@ public class DBHelper {
 		return result;
 	}
 
-	/* roll up; get sum of data per region */
+	/* roll up; get sum of data per country region; # of rows: 8, # of columns: 2 */
 	public String[][] getSumByRegion(){
 		String[][] result = null;
 		colNames = null;
@@ -304,6 +304,7 @@ public class DBHelper {
 	}
 
 
+	/* roll up; get sum of data per series category; # of rows: 4, # of columns: 2 */
 	public String[][] getSumByCategory(){
 		String[][] result = null;
 		colNames = null;
@@ -314,10 +315,64 @@ public class DBHelper {
 
 			/* get number of rows */ 
 			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
-					"FROM (SELECT sc.SeriesCategory, SUM(d.Data) AS SumByCategory\r\n" + 
-					"FROM data_by_year d, series_category sc\r\n" + 
-					"WHERE d.SeriesCode = sc.SeriesCode\r\n" + 
-					"GROUP BY sc.SeriesCategory WITH ROLLUP;) AS SumByCategory;";
+					"FROM (SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
+					"FROM data_by_year d, country_income ci \r\n" + 
+					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
+					"GROUP BY ci.Income WITH ROLLUP) AS SumByCategory;";
+			ps = connection.prepareStatement(statement);	
+			rs = ps.executeQuery(statement);
+			
+			while(rs.next())			
+				row = rs.getInt("RowCount");
+
+			statement = "SSELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
+					"FROM data_by_year d, country_income ci \r\n" + 
+					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
+					"GROUP BY ci.Income WITH ROLLUP;";	
+			ps = connection.prepareStatement(statement);
+			rs = ps.executeQuery(statement);	
+
+			/* get number of columns */			
+			col = rs.getMetaData().getColumnCount();
+
+			result = new String[row][col];
+			colNames = new String[col];
+			
+			row = 0;
+
+			while(rs.next()) {
+				for(int i = 0; i < col; i++) {
+					result[row][i] = rs.getString(i+1);
+					colNames[i] = rs.getMetaData().getColumnLabel(i+1);
+				}
+
+				row++;
+			}
+
+			rs.close();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/* roll up; get sum of data per income; # of rows: 11, # of columns: 2 */
+	public String[][] getSumByIncome(){
+		String[][] result = null;
+		colNames = null;
+
+		try {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+
+			/* get number of rows */ 
+			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
+					"FROM (SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
+					"FROM data_by_year d, country_income ci sc\r\n" + 
+					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
+					"GROUP BY ci.Income WITH ROLLUP) AS SumByCategory;";
 			ps = connection.prepareStatement(statement);	
 			rs = ps.executeQuery(statement);
 			
@@ -356,6 +411,7 @@ public class DBHelper {
 
 		return result;
 	}
+	
 	
 	/* call to after every query get column names */
 	public String[] getColNames() {
