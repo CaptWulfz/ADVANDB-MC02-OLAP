@@ -1,5 +1,6 @@
 package gui;
 
+import util.DBHelper;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -49,12 +50,14 @@ public class main {
 	private JFrame frame;
 	private JScrollPane scrollPane;
 	private JTable table;
-	private JTextField displayNameField;
+	
+	private DBHelper db;
 	
 	/**
 	 * Create the application.
 	 */
-	public main() {
+	public main(DBHelper db) {
+		this.db = db;
 		initialize();
 		this.frame.setVisible(true);
 	}
@@ -64,20 +67,21 @@ public class main {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 935, 658);
+		frame.setBounds(100, 100, 959, 621);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("OLAP");
 		frame.getContentPane().setLayout(null);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(286, 80, 619, 518);
+		tabbedPane.setBounds(327, 51, 602, 518);
 		tabbedPane.setName("TabPane");
 		frame.getContentPane().add(tabbedPane);
 		
 		scrollPane = new JScrollPane();
-		tabbedPane.addTab("main", null, scrollPane, null);
+		tabbedPane.addTab("Data By Year", null, scrollPane, null);
 		
 		table = new JTable();
+		/*
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"as", "as"},
@@ -87,10 +91,16 @@ public class main {
 				"New column", "New column"
 			}
 		));
+		*/
+		
+		Object[][] rows = db.getDataByYear();
+		String[] columns = db.getColNames();
+		
+		table.setModel(createModel(columns, rows));
 		scrollPane.setViewportView(table);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(12, 107, 262, 491);
+		panel.setBounds(12, 78, 199, 491);
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		frame.getContentPane().add(panel);
 		panel.setLayout(null);
@@ -100,181 +110,133 @@ public class main {
 		lblActions.setBounds(12, 13, 117, 26);
 		panel.add(lblActions);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"-- Select --", "Roll Up", "Slice", "Dice", "Drill Down", "Pivot"}));
-		comboBox.setBounds(12, 47, 117, 22);
-		panel.add(comboBox);
+		JComboBox operationBox = new JComboBox();
+		operationBox.setModel(new DefaultComboBoxModel(new String[] {"-- Select --", "Roll Up", "Slice", "Dice", "Drill Down", "Pivot"}));
+		operationBox.setBounds(12, 47, 117, 22);
+		panel.add(operationBox);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_1.setBounds(12, 82, 238, 396);
+		panel_1.setBounds(12, 82, 174, 396);
 		panel.add(panel_1);
+		panel_1.setEnabled(false);
 		
-		JLabel lblDisplayName = new JLabel("Display Name:");
-		
-		displayNameField = new JTextField();
-		displayNameField.setColumns(10);
-		
-		JSeparator separator = new JSeparator();
-		
-		JLabel lblTables = new JLabel("Tables Selected: ");
-		
-		JButton tablesBtn = new JButton("Add / Remove Tables");
-		
-		JLabel lblNone = new JLabel("None");
-		lblNone.setFont(new Font("Tahoma", Font.BOLD, 13));
-		
-		JSeparator separator_1 = new JSeparator();
-		
-		JLabel lblColumnsSelected = new JLabel("Columns Selected:");
-		
-		JLabel label = new JLabel("None");
-		label.setFont(new Font("Tahoma", Font.BOLD, 13));
-		
-		JButton columnsBtn = new JButton("Add / Remove Columns");
-		
-		JSeparator separator_2 = new JSeparator();
-		
-		JLabel lblConditions = new JLabel("Conditions:");
-		
-		JLabel label_1 = new JLabel("None");
-		label_1.setFont(new Font("Tahoma", Font.BOLD, 13));
-		
-		JButton conditionsBtn = new JButton("Add / Remove Conditions");
-		
-		JSeparator separator_3 = new JSeparator();
-		
-		JButton generateBtn = new JButton("Generate Display");
-		generateBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//TODO Get Columns and Rows
-				String[] columns = new String[] {"Masamune", "Murasaki"};
-				Object[][] rows = new Object[][] {
-					{"here", "there"},
-					{"more", "lore"}
-				};
-				
-				createNewTab(displayNameField.getText(), columns, rows);
-			}
-		});
+		JPanel rollUpPanel = new JPanel();
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(lblDisplayName)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(displayNameField, GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-							.addGap(12))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(separator, GroupLayout.PREFERRED_SIZE, 197, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(94)
-					.addComponent(label, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(110, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(separator_1, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-					.addContainerGap())
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(separator_2, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-					.addContainerGap())
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(98)
-					.addComponent(lblNone)
-					.addContainerGap(106, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(63)
-					.addComponent(lblColumnsSelected)
-					.addContainerGap(66, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(68)
-					.addComponent(lblTables)
-					.addContainerGap(68, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(78)
-					.addComponent(lblConditions)
-					.addContainerGap(94, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(96)
-					.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(108, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(30)
-					.addComponent(conditionsBtn)
-					.addContainerGap(29, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(separator_3, GroupLayout.PREFERRED_SIZE, 212, GroupLayout.PREFERRED_SIZE)
+					.addComponent(rollUpPanel, GroupLayout.PREFERRED_SIZE, 172, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(54)
-					.addComponent(generateBtn)
-					.addContainerGap(53, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(35)
-					.addComponent(columnsBtn)
-					.addContainerGap(34, Short.MAX_VALUE))
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(40)
-					.addComponent(tablesBtn)
-					.addContainerGap(41, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblDisplayName)
-						.addComponent(displayNameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblTables)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblNone)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tablesBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator_1, GroupLayout.PREFERRED_SIZE, 2, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblColumnsSelected)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(label)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(columnsBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator_2, GroupLayout.PREFERRED_SIZE, 2, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblConditions)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(label_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(conditionsBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(generateBtn)
-					.addContainerGap(46, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+					.addContainerGap(69, Short.MAX_VALUE)
+					.addComponent(rollUpPanel, GroupLayout.PREFERRED_SIZE, 232, GroupLayout.PREFERRED_SIZE)
+					.addGap(93))
 		);
+		
+		JButton countryBtn = new JButton("Sum By Country");
+		countryBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[][] rows = db.getSumByCountry();
+				String[] columns = db.getColNames();
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumByCountry();
+				
+				columns = db.getColNames();
+				
+				createNewTab("Sum By Country", columns, rows);
+			}
+		});
+		
+		JButton incomeBtn = new JButton("Sum By Income");
+		incomeBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[][] rows = db.getSumByIncome();
+				String[] columns = db.getColNames();
+				
+				createNewTab("Sum By Income", columns, rows);
+			}
+		});
+		
+		JButton yearBtn = new JButton("Sum By Year");
+		yearBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[][] rows = db.getSumByYear();
+				String[] columns = db.getColNames();
+				
+				createNewTab("Sum By Year", columns, rows);
+			}
+		});
+		
+		JButton seriesCodeBtn = new JButton("Sum By Series Code");
+		seriesCodeBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[][] rows = db.getSumBySeriesCode();
+				String[] columns = db.getColNames();
+				
+				createNewTab("Sum By Series Code", columns, rows);
+			}
+		});
+		
+		JButton regionBtn = new JButton("Sum By Region");
+		regionBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Object[][] rows = db.getSumByRegion();
+				String[] columns = db.getColNames();
+				
+				createNewTab("Sum By Region", columns, rows);
+			}
+		});
+		
+		JButton categoryBtn = new JButton("Sum By Category");
+		categoryBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[][] rows = db.getSumByCategory();
+				String[] columns = db.getColNames();
+				
+				createNewTab("Sum By Category", columns, rows);
+			}
+		});
+		GroupLayout gl_rollUpPanel = new GroupLayout(rollUpPanel);
+		gl_rollUpPanel.setHorizontalGroup(
+			gl_rollUpPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_rollUpPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_rollUpPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(categoryBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+						.addComponent(seriesCodeBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+						.addComponent(incomeBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+						.addComponent(regionBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+						.addComponent(yearBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+						.addComponent(countryBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE))
+					.addGap(120))
+		);
+		gl_rollUpPanel.setVerticalGroup(
+			gl_rollUpPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_rollUpPanel.createSequentialGroup()
+					.addGap(22)
+					.addComponent(countryBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(yearBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(regionBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(incomeBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(seriesCodeBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(categoryBtn)
+					.addContainerGap(128, Short.MAX_VALUE))
+		);
+		rollUpPanel.setLayout(gl_rollUpPanel);
 		panel_1.setLayout(gl_panel_1);
 		
 		createComponentMap();
 		
-		// Testing the new tab
-		System.out.println("Creating new tab... ");
-		
-		String[] columns = new String[]{"Column 1", "Column 2", "Column 3"};
-		Object[][] rows = new Object[][] {
-			{"holy", "moly", "lowly"},
-			{"shit", "mate", "late"}
-		};
-		
-		createNewTab("New Tab 2", columns, rows);
 	}
 	
 	//XXX Beginning of Functions for use
@@ -307,6 +269,11 @@ public class main {
 			return (Component) componentMap.get(name);
 		else
 			return null;
+	}
+	
+	public void enableCustom() {
+		
+		
 	}
 	
 	/** This function gets gets the model for the table to use for displaying

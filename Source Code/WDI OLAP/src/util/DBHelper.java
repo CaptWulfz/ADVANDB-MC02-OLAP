@@ -23,7 +23,7 @@ public class DBHelper {
 		String database = "wdi_db";
 		String url = "jdbc:mysql://localhost:3306/";
 		String username = "root";
-		String password = "1234";  
+		String password = "";  
 
 		try {
 			Class.forName(driver);   
@@ -325,7 +325,7 @@ public class DBHelper {
 			while(rs.next())			
 				row = rs.getInt("RowCount");
 
-			statement = "SSELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
+			statement = "SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
 					"FROM data_by_year d, country_income ci \r\n" + 
 					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
 					"GROUP BY ci.Income WITH ROLLUP;";	
@@ -370,7 +370,7 @@ public class DBHelper {
 			/* get number of rows */ 
 			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
 					"FROM (SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
-					"FROM data_by_year d, country_income ci sc\r\n" + 
+					"FROM data_by_year d, country_income ci\r\n" + 
 					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
 					"GROUP BY ci.Income WITH ROLLUP) AS SumByCategory;";
 			ps = connection.prepareStatement(statement);	
