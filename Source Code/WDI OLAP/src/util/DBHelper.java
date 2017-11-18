@@ -23,7 +23,7 @@ public class DBHelper {
 		String database = "wdi_db";
 		String url = "jdbc:mysql://localhost:3306/";
 		String username = "root";
-		String password = "1234";  
+		String password = "";  
 
 		try {
 			Class.forName(driver);   
@@ -422,6 +422,7 @@ public class DBHelper {
 
 			/* get number of rows */ 
 			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
+
 					"FROM (SELECT " + sliceCol + ", SUM(d.Data)\r\n" + 
 					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc\r\n" + 
 					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
@@ -429,6 +430,7 @@ public class DBHelper {
 					"HAVING "+ sliceCol + " LIKE '%" + input + "%') AS SlicedTable;";
 			
 			System.out.println(statement);
+
 			ps = connection.prepareStatement(statement);	
 			rs = ps.executeQuery(statement);
 

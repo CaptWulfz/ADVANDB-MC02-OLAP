@@ -9,7 +9,8 @@ public class Driver {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new main();
+					DBHelper db = new DBHelper();
+					new main(db);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
