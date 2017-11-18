@@ -1,6 +1,7 @@
 import java.awt.EventQueue;
 
 import gui.main;
+import util.DBHelper;
 
 public class Driver {
 
