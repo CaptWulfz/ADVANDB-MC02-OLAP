@@ -9,11 +9,11 @@ import java.util.ArrayList;
 public class DBHelper {
 
 	private Connection connection;
-	
+
 	private String[] colNames = null; /* to get column names, call getColNames() */
 	private int row = 0;
 	private int col = 0;
-	
+
 	public DBHelper() {
 		connectToDatabase();
 	}
@@ -65,7 +65,7 @@ public class DBHelper {
 			result = new String[row][col];
 
 			row = 0;
-			
+
 			while(rs.next()) {
 				for(int i = 0; i < col; i++) {
 					result[row][i] = rs.getString(i+1);
@@ -74,7 +74,7 @@ public class DBHelper {
 
 				row++;
 			}
-			
+
 			rs.close();
 
 		} catch (Exception ex) {
@@ -115,14 +115,14 @@ public class DBHelper {
 			rs = ps.executeQuery(statement);	
 
 			int col;
-		
+
 			/* get number of columns */			
 			col = rs.getMetaData().getColumnCount();
-			
+
 			result = new String[row][col];
 			colNames = new String[col];
-			
-			
+
+
 			System.out.println("col: " + col);
 
 			row = 0;
@@ -266,7 +266,7 @@ public class DBHelper {
 					"GROUP BY cr.Region WITH ROLLUP) AS SumByRegionTable;";
 			ps = connection.prepareStatement(statement);	
 			rs = ps.executeQuery(statement);
-			
+
 			while(rs.next())			
 				row = rs.getInt("RowCount");
 
@@ -282,7 +282,7 @@ public class DBHelper {
 
 			result = new String[row][col];
 			colNames = new String[col];
-			
+
 			row = 0;
 
 			while(rs.next()) {
@@ -303,7 +303,6 @@ public class DBHelper {
 		return result;
 	}
 
-
 	/* roll up; get sum of data per series category; # of rows: 4, # of columns: 2 */
 	public String[][] getSumByCategory(){
 		String[][] result = null;
@@ -315,20 +314,20 @@ public class DBHelper {
 
 			/* get number of rows */ 
 			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
-					"FROM (SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
-					"FROM data_by_year d, country_income ci \r\n" + 
-					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
-					"GROUP BY ci.Income WITH ROLLUP) AS SumByCategory;";
+					"FROM (SELECT sc.SeriesCategory, SUM(d.Data) AS SumByCategory\r\n" + 
+					"FROM data_by_year d, series_category sc\r\n" + 
+					"WHERE d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY sc.SeriesCategory WITH ROLLUP) AS SumByCategory;";
 			ps = connection.prepareStatement(statement);	
 			rs = ps.executeQuery(statement);
-			
+
 			while(rs.next())			
 				row = rs.getInt("RowCount");
 
-			statement = "SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
-					"FROM data_by_year d, country_income ci \r\n" + 
-					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
-					"GROUP BY ci.Income WITH ROLLUP;";	
+			statement = "SELECT sc.SeriesCategory, SUM(d.Data) AS SumByCategory\r\n" + 
+					"FROM data_by_year d, series_category sc\r\n" + 
+					"WHERE d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY sc.SeriesCategory WITH ROLLUP;";	
 			ps = connection.prepareStatement(statement);
 			rs = ps.executeQuery(statement);	
 
@@ -337,7 +336,7 @@ public class DBHelper {
 
 			result = new String[row][col];
 			colNames = new String[col];
-			
+
 			row = 0;
 
 			while(rs.next()) {
@@ -370,19 +369,19 @@ public class DBHelper {
 			/* get number of rows */ 
 			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
 					"FROM (SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
-					"FROM data_by_year d, country_income ci\r\n" + 
+					"FROM data_by_year d, country_income ci \r\n" + 
 					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
 					"GROUP BY ci.Income WITH ROLLUP) AS SumByCategory;";
 			ps = connection.prepareStatement(statement);	
 			rs = ps.executeQuery(statement);
-			
+
 			while(rs.next())			
 				row = rs.getInt("RowCount");
 
-			statement = "SELECT sc.SeriesCategory, SUM(d.Data) AS SumByCategory\r\n" + 
-					"FROM data_by_year d, series_category sc\r\n" + 
-					"WHERE d.SeriesCode = sc.SeriesCode\r\n" + 
-					"GROUP BY sc.SeriesCategory WITH ROLLUP;";	
+			statement = "SELECT ci.Income, SUM(d.Data) AS SumByIncome\r\n" + 
+					"FROM data_by_year d, country_income ci \r\n" + 
+					"WHERE d.CountryCode = ci.CountryCode\r\n" + 
+					"GROUP BY ci.Income WITH ROLLUP;";	
 			ps = connection.prepareStatement(statement);
 			rs = ps.executeQuery(statement);	
 
@@ -391,7 +390,7 @@ public class DBHelper {
 
 			result = new String[row][col];
 			colNames = new String[col];
-			
+
 			row = 0;
 
 			while(rs.next()) {
@@ -411,9 +410,135 @@ public class DBHelper {
 
 		return result;
 	}
+
+	/* slice; sliceCol -> column to be displayed/grouped/sliced, input -> value to slice the column with */
+	public String[][] getSumSlice(String sliceCol, String input){
+		String[][] result = null;
+		colNames = null;
+
+		try {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+
+			/* get number of rows */ 
+			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
+
+					"FROM (SELECT " + sliceCol + ", SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc\r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + sliceCol + "\r\n" + 
+					"HAVING "+ sliceCol + " LIKE '%" + input + "%') AS SlicedTable;";
+			
+			System.out.println(statement);
+
+			ps = connection.prepareStatement(statement);	
+			rs = ps.executeQuery(statement);
+
+			while(rs.next())			
+				row = rs.getInt("RowCount");
+
+			statement = "SELECT " + sliceCol + ", SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc \r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + sliceCol + "\r\n" + 
+					"HAVING "+ sliceCol + " LIKE '%" + input + "%';";
+			ps = connection.prepareStatement(statement);
+			rs = ps.executeQuery(statement);	
+
+			/* get number of columns */			
+			col = rs.getMetaData().getColumnCount();
+
+			result = new String[row][col];
+			colNames = new String[col];
+
+			row = 0;
+
+			while(rs.next()) {
+				for(int i = 0; i < col; i++) {
+					result[row][i] = rs.getString(i+1);
+					colNames[i] = rs.getMetaData().getColumnLabel(i+1);
+				}
+
+				row++;
+			}
+
+			rs.close();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return result;
+	}
+
+	public String[][] getSumDrillDown(ArrayList<String> columnsToGroup){
+		String[][] result = null;
+		colNames = null;
+
+		try {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			
+			String columns = "";
+			String groupBy = "";
+			
+			for(int i = 0; i < columnsToGroup.size(); i++) {
+				columns =columns + columnsToGroup.get(i) + ", ";
+				if(i == columnsToGroup.size()-1)
+					groupBy = groupBy + columnsToGroup.get(i);
+				else
+					groupBy = columnsToGroup.get(i) + ", ";
+			}
+
+			/* get number of rows */ 
+			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
+					"FROM (SELECT " + columns  + "SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc\r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + groupBy + ") AS SlicedTable;";
+			
+			System.out.println(statement);
+			ps = connection.prepareStatement(statement);	
+			rs = ps.executeQuery(statement);
+
+			while(rs.next())			
+				row = rs.getInt("RowCount");
+
+			statement = "SELECT " + columns + "SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc \r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + groupBy + ";";
+			ps = connection.prepareStatement(statement);
+			rs = ps.executeQuery(statement);	
+
+			/* get number of columns */			
+			col = rs.getMetaData().getColumnCount();
+
+			result = new String[row][col];
+			colNames = new String[col];
+
+			row = 0;
+
+			while(rs.next()) {
+				for(int i = 0; i < col; i++) {
+					result[row][i] = rs.getString(i+1);
+					colNames[i] = rs.getMetaData().getColumnLabel(i+1);
+				}
+
+				row++;
+			}
+
+			rs.close();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return result;
+
+	}
 	
-	
-	/* call to after every query get column names */
+	/* call after every query to get column names */
 	public String[] getColNames() {
 		return colNames;
 	}
