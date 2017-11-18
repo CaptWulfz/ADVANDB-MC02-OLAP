@@ -467,9 +467,75 @@ public class DBHelper {
 		}
 
 		return result;
-
 	}
 
+	public String[][] getSumDrillDown(ArrayList<String> columnsToGroup){
+		String[][] result = null;
+		colNames = null;
+
+		try {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			
+			String columns = "";
+			String groupBy = "";
+			
+			for(int i = 0; i < columnsToGroup.size(); i++) {
+				columns =columns + columnsToGroup.get(i) + ", ";
+				if(i == columnsToGroup.size()-1)
+					groupBy = groupBy + columnsToGroup.get(i);
+				else
+					groupBy = columnsToGroup.get(i) + ", ";
+			}
+
+			/* get number of rows */ 
+			String statement = "SELECT COUNT(*) AS RowCount\r\n" + 
+					"FROM (SELECT " + columns  + "SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc\r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + groupBy + ") AS SlicedTable;";
+			
+			System.out.println(statement);
+			ps = connection.prepareStatement(statement);	
+			rs = ps.executeQuery(statement);
+
+			while(rs.next())			
+				row = rs.getInt("RowCount");
+
+			statement = "SELECT " + columns + "SUM(d.Data)\r\n" + 
+					"FROM data_by_year d, country c, country_income ci, country_region cr, series s, series_category sc \r\n" + 
+					"WHERE d.CountryCode = c.CountryCode AND d.CountryCode = ci.CountryCode AND d.CountryCode = cr.CountryCode AND d.CountryCode = c.CountryCode AND d.SeriesCode = s.SeriesCode AND d.SeriesCode = sc.SeriesCode\r\n" + 
+					"GROUP BY " + groupBy + ";";
+			ps = connection.prepareStatement(statement);
+			rs = ps.executeQuery(statement);	
+
+			/* get number of columns */			
+			col = rs.getMetaData().getColumnCount();
+
+			result = new String[row][col];
+			colNames = new String[col];
+
+			row = 0;
+
+			while(rs.next()) {
+				for(int i = 0; i < col; i++) {
+					result[row][i] = rs.getString(i+1);
+					colNames[i] = rs.getMetaData().getColumnLabel(i+1);
+				}
+
+				row++;
+			}
+
+			rs.close();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return result;
+
+	}
+	
 	/* call after every query to get column names */
 	public String[] getColNames() {
 		return colNames;
