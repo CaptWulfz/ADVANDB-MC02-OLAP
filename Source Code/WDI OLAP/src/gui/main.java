@@ -137,15 +137,25 @@ public class main {
 					.addGap(93))
 		);
 		
+		//TODO Nella Start Here
 		JButton countryBtn = new JButton("Sum By Country");
 		countryBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[][] rows = db.getSumByCountry();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
 				
 				if (operationBox.getSelectedItem().equals("Roll Up"))
 					rows = db.getSumByCountry();
-				
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
 				columns = db.getColNames();
 				
 				createNewTab("Sum By Country", columns, rows);
@@ -155,8 +165,22 @@ public class main {
 		JButton incomeBtn = new JButton("Sum By Income");
 		incomeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[][] rows = db.getSumByIncome();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumByIncome();
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
+				columns = db.getColNames();
 				
 				createNewTab("Sum By Income", columns, rows);
 			}
@@ -165,8 +189,22 @@ public class main {
 		JButton yearBtn = new JButton("Sum By Year");
 		yearBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[][] rows = db.getSumByYear();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumByYear();
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
+				columns = db.getColNames();
 				
 				createNewTab("Sum By Year", columns, rows);
 			}
@@ -175,8 +213,22 @@ public class main {
 		JButton seriesCodeBtn = new JButton("Sum By Series Code");
 		seriesCodeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[][] rows = db.getSumBySeriesCode();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumBySeriesCode();
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
+				columns = db.getColNames();
 				
 				createNewTab("Sum By Series Code", columns, rows);
 			}
@@ -185,8 +237,22 @@ public class main {
 		JButton regionBtn = new JButton("Sum By Region");
 		regionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Object[][] rows = db.getSumByRegion();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumByRegion();
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
+				columns = db.getColNames();
 				
 				createNewTab("Sum By Region", columns, rows);
 			}
@@ -195,12 +261,28 @@ public class main {
 		JButton categoryBtn = new JButton("Sum By Category");
 		categoryBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[][] rows = db.getSumByCategory();
-				String[] columns = db.getColNames();
+				Object[][] rows = null;
+				String[] columns = null;
+				
+				if (operationBox.getSelectedItem().equals("Roll Up"))
+					rows = db.getSumByCategory();
+				else if (operationBox.getSelectedItem().equals("Slice"))
+					rows = db.getSumSlice(null, null);
+				else if (operationBox.getSelectedItem().equals("Drill Down"))
+					rows = db.getSumDrillDown(null);
+				else if (operationBox.getSelectedItem().equals("Dice"))
+					//something happens
+					System.out.println("Something");
+				else if (operationBox.getSelectedItem().equals("Pivot"))
+					//something that happens
+					
+				columns = db.getColNames();
 				
 				createNewTab("Sum By Category", columns, rows);
 			}
 		});
+		//XXX Nella End Here
+		
 		GroupLayout gl_rollUpPanel = new GroupLayout(rollUpPanel);
 		gl_rollUpPanel.setHorizontalGroup(
 			gl_rollUpPanel.createParallelGroup(Alignment.TRAILING)
